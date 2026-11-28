@@ -1,6 +1,6 @@
 // Serverhandlingen sendBid (FK-04) mot SQLite i minnet. Beviser at brukeren alltid kommer fra økten, at uinnloggede
 // og brukere uten kontooppsett sendes videre uten å lagre noe, og at feil kommer tilbake til skjemaet.
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { listing, offer, request, user } from "@/db/schema";
 import type { Db } from "@/db/types";
 import { createTestDb } from "@/test/test-db";
@@ -53,6 +53,14 @@ function form(fields: Record<string, string>) {
 async function counts() {
   return { requests: (await holder.db.select().from(request)).length, offers: (await holder.db.select().from(offer)).length };
 }
+
+// Klokka er frosset til 05.11.2026, så de faste lånedatoene alltid ligger frem i tid. Bare Date er falsk.
+beforeAll(() => {
+  vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-05T12:00:00Z") });
+});
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 beforeEach(async () => {
   holder.db = createTestDb();
