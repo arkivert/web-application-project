@@ -1,5 +1,6 @@
 // Selgeren svarer på bud (#187). Mockup godkjent av Max 18.10. Selgeren «E2E Selger» er innlogget, og tre bud fra
 // «E2E Kjøper» ligger klare (global-setup legger dem inn på nytt før hver kjøring).
+import { dayFromNow, period } from "./dates";
 import { expect, test, type Page } from "@playwright/test";
 import { BUYER_AUTH_FILE, SELLER_AUTH_FILE } from "./global-setup";
 
@@ -69,26 +70,30 @@ test("selgeren avslår først etter en bekreftelse, og Avbryt angrer", async ({ 
   await expect(page.getByRole("button", { name: "Godta" })).toHaveCount(0);
 });
 
-// Lån og gis bort (#208). «E2E Kjøper» ber om å låne 12.11 – 19.11 og om å få lampen.
+// Lån og gis bort (#208). «E2E Kjøper» ber om å låne i 8 dager fra om to uker og om å få lampen.
+// Motbudet starter to dager senere: først 4 dager (for kort), så 8 dager.
+const COUNTER_START = dayFromNow(16);
+const COUNTER_TOO_SHORT_END = dayFromNow(19);
+const COUNTER_END = dayFromNow(23);
 test("selgeren sender motbud på et lån med ny periode, og låneren godtar det", async ({ page, browser, baseURL }) => {
   await page.goto("/requests/e2e-req-lan", { waitUntil: "networkidle" });
   await expect(bannerOf(page)).toHaveText("Ny forespørsel fra E2E Kjøper");
   await expect(page.getByLabel("Fra")).toHaveCount(0);
 
   await page.getByRole("button", { name: "Motbud" }).click();
-  await page.getByLabel("Fra").fill("2026-11-14");
-  await page.getByLabel("Til").fill("2026-11-17");
+  await page.getByLabel("Fra").fill(COUNTER_START);
+  await page.getByLabel("Til").fill(COUNTER_TOO_SHORT_END);
   await page.getByRole("button", { name: "Send motbud" }).click();
   await expect(page.getByRole("alert").filter({ hasText: "Lånet må vare minst én uke" })).toBeVisible();
-  await expect(page.getByLabel("Fra")).toHaveValue("2026-11-14");
+  await expect(page.getByLabel("Fra")).toHaveValue(COUNTER_START);
 
-  await page.getByLabel("Til").fill("2026-11-21");
+  await page.getByLabel("Til").fill(COUNTER_END);
   await expect(page.getByText("Antall dager")).toBeVisible();
   await page.getByRole("button", { name: "Send motbud" }).click();
 
-  await expect(toastOf(page)).toHaveText(/Motbud sendt: 14\.11 – 21\.11/);
+  await expect(toastOf(page)).toContainText(`Motbud sendt: ${period(COUNTER_START, COUNTER_END)}`);
   await expect(bannerOf(page)).toHaveText("Venter på svar fra E2E Kjøper");
-  await expect(page.getByText("14.11 – 21.11", { exact: true })).toBeVisible();
+  await expect(page.getByText(period(COUNTER_START, COUNTER_END), { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Godta" })).toHaveCount(0);
 
   const buyer = await browser.newContext({ storageState: BUYER_AUTH_FILE, baseURL });
@@ -98,7 +103,7 @@ test("selgeren sender motbud på et lån med ny periode, og låneren godtar det"
   await buyerPage.getByRole("button", { name: "Godta" }).click();
   await expect(buyerPage.locator('div[role="status"]')).toHaveText(/Du godtok forespørselen/);
   await expect(buyerPage.locator('p[role="status"]')).toHaveText("Avtalt");
-  await expect(buyerPage.getByText("14.11 – 21.11", { exact: true })).toBeVisible();
+  await expect(buyerPage.getByText(period(COUNTER_START, COUNTER_END), { exact: true })).toBeVisible();
   await buyer.close();
 });
 

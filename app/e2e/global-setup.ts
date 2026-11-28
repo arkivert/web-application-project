@@ -4,6 +4,7 @@
 import { execSync } from "node:child_process";
 import { createHmac, randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dayFromNow } from "./dates";
 import { E2E_STATE } from "./state";
 
 export const AUTH_FILE = "e2e/.auth/user.json";
@@ -97,7 +98,7 @@ export default function globalSetup() {
          ('e2e-offer-avslag', 'e2e-req-avslag', 'e2e-buyer', 180, NULL, NULL),
          ('e2e-offer-retur', 'e2e-req-retur', 'e2e-buyer', NULL, '2026-11-12', '2026-11-19'),
          ('e2e-offer-trekk', 'e2e-req-trekk', 'e2e-buyer', 190, NULL, NULL),
-         ('e2e-offer-lan', 'e2e-req-lan', 'e2e-buyer', NULL, '2026-11-12', '2026-11-19'),
+         ('e2e-offer-lan', 'e2e-req-lan', 'e2e-buyer', NULL, '${dayFromNow(14)}', '${dayFromNow(21)}'),
          ('e2e-offer-gis', 'e2e-req-gis', 'e2e-buyer', NULL, NULL, NULL),
          ('e2e-offer-hist', 'e2e-req-hist', 'e2e-buyer', 170, NULL, NULL);
      DELETE FROM listing_image WHERE listing_id IN ('${TEST_LISTING_ID}', '${TEST_GALLERY_ID}');
