@@ -10,7 +10,7 @@ Oppføringene til og med 05.10.2026 er rekonstruert fra Git-historikken samme da
 
 ## 2026-11-28
 
-- Tester (#318): lånetestene fryser klokka til 05.11.2026, så de faste datoene ikke blir fortid. Ti tester feilet etter 12.11. Appkoden er uendret. (Max, KI-arbeid av Claude, #318)
+- Tester (#318): lånetestene fryser klokka til 05.11.2026, så de faste datoene ikke blir fortid. Ti tester feilet etter 12.11. Nettlesertestene for lån regner datoene fra dagens dato (e2e/dates.ts). Appkoden er uendret. (Max, KI-arbeid av Claude, #318)
 
 ## 2026-11-05
 
