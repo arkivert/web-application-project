@@ -8,6 +8,10 @@ den lokale arbeidsloggen (se [loggrutinen](prosess/loggrutine.md)). Én linje pe
 Skriv hvem som besluttet eller gjorde endringen, og lenk PR eller issue når det finnes.
 Oppføringene til og med 05.10.2026 er rekonstruert fra Git-historikken samme dag.
 
+## 2026-11-28
+
+- Tester (#318): lånetestene fryser klokka til 05.11.2026, så de faste datoene ikke blir fortid. Ti tester feilet etter 12.11. Nettlesertestene for lån regner datoene fra dagens dato (e2e/dates.ts). Appkoden er uendret. (Max, KI-arbeid av Claude, #318)
+
 ## 2026-11-05
 
 - Annonsekort (#309): tittelen har alltid plass til to linjer, så alle kort er like høye. (Max, #309)
