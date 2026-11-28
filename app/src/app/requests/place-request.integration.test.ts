@@ -1,7 +1,7 @@
 // placeRequest for lån og gis bort (#186a) og getOccupiedPeriods mot SQLite i minnet med appens migrasjoner.
 // Hver avvisning sjekker at ingenting ble lagret. Plan godkjent av Max 20.10.
 import { eq } from "drizzle-orm";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { listing, offer, request, user } from "@/db/schema";
 import type { Db } from "@/db/types";
 import { createTestDb } from "@/test/test-db";
@@ -23,6 +23,14 @@ async function seedLoan(id: string, status: "accepted" | "in_use" | "declined" |
   await db.insert(request).values({ id, listingId: "tent", requesterId: `u-${id}`, status });
   await db.insert(offer).values({ requestId: id, senderId: `u-${id}`, startDate, endDate });
 }
+
+// Klokka er frosset til 05.11.2026, så de faste lånedatoene alltid ligger frem i tid. Bare Date er falsk.
+beforeAll(() => {
+  vi.useFakeTimers({ toFake: ["Date"], now: new Date("2026-11-05T12:00:00Z") });
+});
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 beforeEach(async () => {
   db = createTestDb();
